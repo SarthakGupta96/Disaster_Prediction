@@ -2,20 +2,20 @@ import streamlit as st
 import pandas as pd
 import joblib
 import numpy as np
-# from tensorflow.keras.models import load_model
 
+# -----------------------------
+# PAGE CONFIG
+# -----------------------------
+st.set_page_config(page_title="Disaster Prediction", layout="wide")
 
-# Load data for visualization
+# -----------------------------
+# LOAD DATA (FOR VISUALIZATION)
+# -----------------------------
 data1 = pd.read_csv("hehe.csv")
 data2 = pd.read_csv("hehe2.csv")
 data = pd.concat([data1, data2], ignore_index=True)
 
 data.fillna(0, inplace=True)
-
-ml_data = data.copy()
-ml_data.rename(columns={
-    'Start Year': 'Year'
-}, inplace=True)
 
 # -----------------------------
 # LOAD MODELS
@@ -27,9 +27,6 @@ scaler = joblib.load("scaler.pkl")
 le1 = joblib.load("le_continent.pkl")
 le2 = joblib.load("le_type.pkl")
 le3 = joblib.load("le_subtype.pkl")
-
-# lstm_model = load_model("lstm_model.h5")
-# lstm_scaler = joblib.load("lstm_scaler.pkl")
 
 # -----------------------------
 # UI
@@ -76,39 +73,44 @@ if st.button("Predict Risk"):
     rf_pred = rf_model.predict(input_scaled)[0]
     xgb_pred = xgb_model.predict(input_scaled)[0]
 
-    labels = ["Low", "Medium", "High"]
+    labels = ["🟢 Low", "🟡 Medium", "🔴 High"]
 
-    st.success(f"🌳 RF Prediction: {labels[rf_pred]}")
-    st.success(f"⚡ XGB Prediction: {labels[xgb_pred]}")
+    st.subheader("📊 Prediction Results")
+    st.success(f"🌳 Random Forest: {labels[rf_pred]}")
+    st.success(f"⚡ XGBoost: {labels[xgb_pred]}")
+
+    st.markdown("---")
 
     # ==============================
-# 🌍 MAP VISUALIZATION
-# ==============================
-st.header("🌍 Disaster Location Map")
+    # 🌍 MAP VISUALIZATION
+    # ==============================
+    st.header("🌍 Disaster Location Map")
 
-map_data = pd.DataFrame({
-    'lat': [lat],
-    'lon': [lon]
-})
+    map_data = pd.DataFrame({
+        'lat': [lat],
+        'lon': [lon]
+    })
 
-st.map(map_data)
+    st.map(map_data)
 
+    st.markdown("---")
 
-# ==============================
-# 📊 YEARLY TREND GRAPH
-# ==============================
-st.header("📊 Disaster Trend Over Years")
+    # ==============================
+    # 📊 YEARLY TREND GRAPH (FIXED)
+    # ==============================
+    st.header("📊 Disaster Trend Over Years")
 
-yearly = ml_data.groupby("Year").size()
+    yearly = data.groupby("Start Year").size()
 
-st.line_chart(yearly)
+    st.line_chart(yearly)
 
+    st.markdown("---")
 
-# ==============================
-# 🌪️ TOP DISASTER TYPES
-# ==============================
-st.header("🌪️ Most Common Disaster Types")
+    # ==============================
+    # 🌪️ TOP DISASTER TYPES
+    # ==============================
+    st.header("🌪️ Most Common Disaster Types")
 
-type_counts = data['Disaster Type'].value_counts().head(10)
+    type_counts = data['Disaster Type'].value_counts().head(10)
 
-st.bar_chart(type_counts)
+    st.bar_chart(type_counts)
