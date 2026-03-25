@@ -28,8 +28,8 @@ le1 = joblib.load("le_continent.pkl")
 le2 = joblib.load("le_type.pkl")
 le3 = joblib.load("le_subtype.pkl")
 
-lstm_model = load_model("lstm_model.h5")
-lstm_scaler = joblib.load("lstm_scaler.pkl")
+# lstm_model = load_model("lstm_model.h5")
+# lstm_scaler = joblib.load("lstm_scaler.pkl")
 
 # -----------------------------
 # UI
