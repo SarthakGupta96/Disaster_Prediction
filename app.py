@@ -4,14 +4,18 @@ import joblib
 import numpy as np
 from tensorflow.keras.models import load_model
 
-# -----------------------------
-# LOAD DATA (FOR VISUALIZATION)
-# -----------------------------
+
+# Load data for visualization
 data1 = pd.read_csv("hehe.csv")
 data2 = pd.read_csv("hehe2.csv")
 data = pd.concat([data1, data2], ignore_index=True)
 
 data.fillna(0, inplace=True)
+
+ml_data = data.copy()
+ml_data.rename(columns={
+    'Start Year': 'Year'
+}, inplace=True)
 
 # -----------------------------
 # LOAD MODELS
@@ -72,61 +76,39 @@ if st.button("Predict Risk"):
     rf_pred = rf_model.predict(input_scaled)[0]
     xgb_pred = xgb_model.predict(input_scaled)[0]
 
-    labels = ["🟢 Low", "🟡 Medium", "🔴 High"]
+    labels = ["Low", "Medium", "High"]
 
-    st.subheader("📊 Prediction Results")
-    st.success(f"🌳 Random Forest: {labels[rf_pred]}")
-    st.success(f"⚡ XGBoost: {labels[xgb_pred]}")
-
-    st.markdown("---")
+    st.success(f"🌳 RF Prediction: {labels[rf_pred]}")
+    st.success(f"⚡ XGB Prediction: {labels[xgb_pred]}")
 
     # ==============================
-    # 🌍 MAP VISUALIZATION
-    # ==============================
-    st.header("🌍 Disaster Location Map")
+# 🌍 MAP VISUALIZATION
+# ==============================
+st.header("🌍 Disaster Location Map")
 
-    map_data = pd.DataFrame({
-        'lat': [lat],
-        'lon': [lon]
-    })
+map_data = pd.DataFrame({
+    'lat': [lat],
+    'lon': [lon]
+})
 
-    st.map(map_data)
-
-    st.markdown("---")
-
-    # ==============================
-    # 📊 YEARLY TREND GRAPH (FIXED)
-    # ==============================
-    st.header("📊 Disaster Trend Over Years")
-
-    yearly = data.groupby("Start Year").size()
-
-    st.line_chart(yearly)
-
-    st.markdown("---")
-
-    # ==============================
-    # 🌪️ TOP DISASTER TYPES
-    # ==============================
-    st.header("🌪️ Most Common Disaster Types")
-
-    type_counts = data['Disaster Type'].value_counts().head(10)
-
-    st.bar_chart(type_counts)
+st.map(map_data)
 
 
-# -----------------------------
-# LSTM SECTION (SEPARATE)
-# -----------------------------
-st.markdown("---")
-st.header("📈 Future Disaster Prediction")
+# ==============================
+# 📊 YEARLY TREND GRAPH
+# ==============================
+st.header("📊 Disaster Trend Over Years")
 
-if st.button("Predict Next Year Disasters"):
+yearly = ml_data.groupby("Year").size()
 
-    # Dummy sequence (for demo)
-    last_seq = np.array([[0.5], [0.6], [0.7]]).reshape(1, 3, 1)
+st.line_chart(yearly)
 
-    pred = lstm_model.predict(last_seq)
-    pred = lstm_scaler.inverse_transform(pred)
 
-    st.success(f"🔮 Expected disasters next year: {int(pred[0][0])}")
+# ==============================
+# 🌪️ TOP DISASTER TYPES
+# ==============================
+st.header("🌪️ Most Common Disaster Types")
+
+type_counts = data['Disaster Type'].value_counts().head(10)
+
+st.bar_chart(type_counts)
