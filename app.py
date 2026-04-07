@@ -15,7 +15,13 @@ data1 = pd.read_csv("hehe.csv")
 data2 = pd.read_csv("hehe2.csv")
 data = pd.concat([data1, data2], ignore_index=True)
 
-data.fillna(0, inplace=True)
+# Fill numeric columns
+num_cols = data.select_dtypes(include=['int64', 'float64']).columns
+data[num_cols] = data[num_cols].fillna(0)
+
+# Fill string columns
+str_cols = data.select_dtypes(include=['object', 'string']).columns
+data[str_cols] = data[str_cols].fillna("Unknown")
 
 # -----------------------------
 # LOAD MODELS
