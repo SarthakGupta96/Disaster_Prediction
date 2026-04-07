@@ -49,12 +49,25 @@ continent = st.selectbox("Continent", le1.classes_)
 dtype = st.selectbox("Disaster Type", le2.classes_)
 subtype = st.selectbox("Disaster Subtype", le3.classes_)
 
-lat = st.number_input("Latitude", value=0.0)
-lon = st.number_input("Longitude", value=0.0)
+# ✅ FIXED DEFAULT LOCATION (VISIBLE)
+lat = st.number_input("Latitude", value=20.5937)
+lon = st.number_input("Longitude", value=78.9629)
 
 mag = st.number_input("Magnitude", value=1.0)
 affected = st.number_input("Total Affected", value=1000)
 damage = st.number_input("Total Damage", value=1000)
+
+# ==============================
+# 🌍 MAP VISUALIZATION (FIXED)
+# ==============================
+st.header("🌍 Disaster Location Map")
+
+map_data = pd.DataFrame({
+    'lat': [lat],
+    'lon': [lon]
+})
+
+st.map(map_data, zoom=5)
 
 # -----------------------------
 # PREDICT
@@ -84,20 +97,6 @@ if st.button("Predict Risk"):
     st.subheader("📊 Prediction Results")
     st.success(f"🌳 Random Forest: {labels[rf_pred]}")
     st.success(f"⚡ XGBoost: {labels[xgb_pred]}")
-
-    st.markdown("---")
-
-    # ==============================
-    # 🌍 MAP VISUALIZATION
-    # ==============================
-    st.header("🌍 Disaster Location Map")
-
-    map_data = pd.DataFrame({
-        'lat': [lat],
-        'lon': [lon]
-    })
-
-    st.map(map_data)
 
     st.markdown("---")
 
